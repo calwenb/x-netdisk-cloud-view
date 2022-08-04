@@ -1,0 +1,20 @@
+.pwdDialog{
+  left: 30%;
+  width: 40%;
+}
+@media only screen and (max-width: 900px) {
+
+  .pwdDialog{
+    left: 5%;
+    width: 100%;
+  }
+  .mobileHide {
+    display: none;
+  }
+  .mobileFont{
+    font-size: 15px;
+  }
+  .leftNav {
+    width: 90px !important;
+  }
+}

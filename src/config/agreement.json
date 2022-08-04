@@ -1,0 +1,12 @@
+{
+  "code": {
+    "200": "success",
+    "700": "error",
+    "701": "upload file error",
+    "702": "download file error"
+  },
+  "cookies": {
+    "TOKEN": "用户令牌"
+
+  }
+}

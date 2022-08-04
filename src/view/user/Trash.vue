@@ -23,9 +23,8 @@
                   v-for="(file,i) in fileList" :key="i">
             <el-tooltip :content="file.myFileName+' 点击查看原图'" placement="top-start" :open-delay="1000">
               <div class="grid-content bg-purple pointer">
-                <el-image :src="file.data"
+                <el-image :src="boxImage"
                           @click="preview(file)"
-                          :preview-src-list="[file.data]"
                           @contextmenu.prevent="onContextmenu($event,file)">
                   <div slot="error" class="image-slot">
                     <i class="el-icon-picture-outline"></i>
@@ -33,8 +32,9 @@
                 </el-image>
               </div>
             </el-tooltip>
-
-
+            <el-row>
+              {{file.myFileName}}
+            </el-row>
           </el-col>
         </el-row>
       </ul>
@@ -63,6 +63,7 @@ export default {
         type: '',
         data: ''
       },
+      boxImage: 'https://cube.elemecdn.com/6/94/4d3ea53c084bad6931a56d5158a48jpeg.jpeg',
       drawer: false,
       fileList: [{
         myFileId: '',
@@ -111,6 +112,7 @@ export default {
               this.refresh();
             }
           },
+
           {
             label: "查看信息",
             onClick: () => {
@@ -165,8 +167,10 @@ export default {
       }
 
       that.axios({
-        url: Global.SERVER_ADDRESS + '/trashs/data' + '/p/' + page,
-        params: {},
+        url: Global.SERVER_ADDRESS + '/trashs/list',
+        params: {
+          "page": page
+        },
         method: 'GET',
       }).then(function (rs) {
         console.log("rs", rs)
@@ -178,16 +182,12 @@ export default {
         }
         if (type === "append") {
           for (let i = 0; i < data.length; i++) {
-            const file = JSON.parse(data[i].msg);
-            file['data'] = data[i].data;
-            that.fileList.push(file)
+            that.fileList.push(data[i])
           }
         } else {
           var rsFileList = [];
           for (let i = 0; i < data.length; i++) {
-            const file = JSON.parse(data[i].msg);
-            file['data'] = data[i].data;
-            rsFileList.push(file);
+            rsFileList.push(data[i]);
           }
           that.fileList = rsFileList;
         }

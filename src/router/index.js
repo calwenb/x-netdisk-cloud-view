@@ -11,47 +11,75 @@ import AdminUserMsg from "../view/admin/AdminUserMsg";
 import StoreMsg from "../view/admin/StoreMsg";
 import allFiles from "../view/user/AllFiles";
 import FilesType from "../view/user/FilesType";
+import Trash from "../view/user/Trash";
 
 Vue.use(VueRouter);
 export default new VueRouter({
   mode: "history", /*配置路由*/
   routes: [{
-    path: "/test", component: Test,
-  }, {
-    path: "/login", component: Login,
-  }, {
-    path: "/re_pwd", component: Repwd,
-  }, {
-    path: "/re_pwd/:loginName", component: Repwd,
-  }, {
-    path: "/register", component: Register
+    path: "/test",
+    component: Test,
+  },
+    {
+    path: "/login",
+    component: Login,
+  },
+    {
+    path: "/re_pwd",
+    component: Repwd,
+  },
+    {
+    path: "/re_pwd/:loginName",
+    component: Repwd,
+  },
+    {
+    path: "/register",
+    component: Register
   }, /* 左导航栏路由 */
     {
-      path: "/", component: Index, children: [{
-        path: "/file/index", component: allFiles
-      }, {
-        path: "/file/type/:type", component: FilesType
-      }, /*
+      path: "/",
+      component: Index,
+      children: [{
+        path: "/file/index",
+        component: allFiles
+      },
+        {
+        path: "/file/type/:type",
+          component: FilesType
+      },
          {
-           path: "/gallery/trash",
+           path: "/file/trash",
            component: Trash
-         },*/
+         },
         /*管理员路由*/
         {
-          path: "/admin/user_msg", component: AdminUserMsg,
-        }, {
-          path: "/admin/store_msg", component: StoreMsg,
+          path: "/admin/user_msg",
+          component: AdminUserMsg,
+        },
+        {
+          path: "/admin/store_msg",
+          component: StoreMsg,
         }]
-    }, {
-      path: "/index", component: Index, children: [{
-        path: "/file/index", component: allFiles
+    },
+    {
+      path: "/index",
+      component: Index,
+      children: [{
+        path: "/file/index",
+        component: allFiles
       }]
-    }, {
-      path: "/getshare", component: GetShare
-    }, {
-      path: "/getshare/:code", component: GetShare
-    }, {
-      path: "/*", component: Miss
+    },
+    {
+      path: "/getshare",
+      component: GetShare
+    },
+    {
+      path: "/getshare/:code",
+      component: GetShare
+    },
+    {
+      path: "/*",
+      component: Miss
     }
 
   ]

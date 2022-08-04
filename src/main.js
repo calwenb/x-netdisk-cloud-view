@@ -12,6 +12,7 @@ import 'element-ui/lib/theme-chalk/index.css';
 import VueCookies from "vue-cookies";
 import './assets/css/mobile.css'; // 全局css
 import Contextmenu from "vue-contextmenujs"
+import uploader from 'vue-simple-uploader'
 
 
 Vue.use(Contextmenu);
@@ -19,6 +20,7 @@ Vue.config.productionTip = false
 Vue.use(ElementUI);
 Vue.use(VueAxios, axios)
 Vue.use(VueCookies);
+Vue.use(uploader)
 
 router.beforeEach((to, from, next) => {
   if (to.path === '/' || to.path === '/login' || to.path === '/register' || to.path.includes('/getshare') || to.path.includes('/re_pwd')) {

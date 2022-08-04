@@ -41,7 +41,7 @@ export default {
       },
       close_list: false,
       uploadData: {
-        fatherFileFolderId: '0'
+        fid: '0'
       },
       uploadUrl: Global.SERVER_ADDRESS + '/files/upload',
       parentFolderId: ''
@@ -49,7 +49,7 @@ export default {
   },
   created() {
     eventBus.$on("FolderId", data => {
-      this.uploadData.fatherFileFolderId = data;
+      this.uploadData.fid = data;
     });
   },
   methods: {

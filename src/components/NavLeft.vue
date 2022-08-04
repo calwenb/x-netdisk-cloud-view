@@ -90,29 +90,27 @@
             <span class="mobileHide">其他</span></router-link>
         </span>
       </el-menu-item>
-      <!--
-            <el-menu-item index="3">
-              <span slot="title">
-                <router-link to="/gallery/trash">
-                  <svg class="icon" aria-hidden="true">
-                      <use xlink:href="#icon-huishouzhan"></use>
-                   </svg>
-                  <span class="mobileHide">回收站</span>
-                </router-link>
-              </span>
-            </el-menu-item>
-            <el-menu-item index="4">
-              <span slot="title">
-                <router-link to="/test"><i class="el-icon-coin"></i>
-                  <span class="mobileHide">测试</span>
-                </router-link>
-              </span>
-            </el-menu-item>-->
+      <el-menu-item index="3">
+        <span slot="title">
+          <router-link to="/file/trash">
+            <svg class="icon" aria-hidden="true">
+              <use xlink:href="#icon-huishouzhan"></use>
+            </svg>
+            <span class="mobileHide">回收站</span>
+          </router-link>
+        </span>
+      </el-menu-item>
+      <el-menu-item index="4">
+        <span slot="title">
+          <router-link to="/test"><i class="el-icon-coin"></i>
+            <span class="mobileHide">测试</span>
+          </router-link>
+        </span>
+      </el-menu-item>
       <div>
         <el-row>
           <el-progress type="circle" :percentage="storePercen"></el-progress>
         </el-row>
-
         <p>已使用：{{ (storeMsg.currentSize / 1024 + 0.5).toFixed(0) }} M</p>
         <p>总容量：{{ storeMsg.maxSize / (1024) }} M</p>
         <el-row>

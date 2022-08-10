@@ -127,12 +127,17 @@
     </div>
     <div>
 
+
       <el-drawer
         title="文件浏览"
         :visible.sync="drawer"
-        size="50%">
+        size="60%">
+
         <el-card style="font-size: 15px" shadow="hover">
-          <p v-if="previewFile.type=='text'" style="white-space:pre-wrap;">{{ previewFile.data }}</p>
+          <p v-if="previewFile.type==='text'" style="white-space:pre-wrap;">
+            <editor :fileData="previewFile.data"></editor>
+            <!--            {{ previewFile.data }}-->
+          </p>
           <img :src="previewFile.data" width="500px" v-if="previewFile.type=='img'"/>
         </el-card>
       </el-drawer>
@@ -163,11 +168,15 @@ import eventBus from "../../js/eventBus";
 import QRCode from "qrcodejs2"
 import fileDownload from "js-file-download";
 import folderTree from "../../components/FolderTree";
+import Editor from "../../components/Editor";
 
 
 export default {
   name: "AllFiles",
-  components: {"folderTree": folderTree},
+  components: {
+    "folderTree": folderTree,
+    "editor": Editor
+  },
   data() {
     return {
       title: '全部文件',

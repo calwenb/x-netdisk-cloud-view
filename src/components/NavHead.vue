@@ -1,10 +1,12 @@
 <template>
   <div>
     <el-row type="flex" class="row-bg" :gutter="10">
-
       <el-col :xs="4" :md="4" style="overflow:hidden;" v-if="user.userType!==0||user.userType!==1">
         <div class="grid-content bg-purple">
-          <UploadFile :user="user" :token="token"/>
+          <el-button type="primary" @click="uploadOpen">
+            <i class="el-icon-upload el-icon--right" style="color: white;"></i>
+            <span class="mobileHide">上传</span>
+          </el-button>
         </div>
       </el-col>
 
@@ -91,7 +93,7 @@
         </svg>
       </el-col>
     </el-row>
-
+    <upload-file/>
     <el-dialog
       title="修改密码"
       :visible.sync="dialogVisible"
@@ -113,6 +115,8 @@ import Global from "../js/global";
 import eventBus from "../js/eventBus";
 import Search from "./Search";
 import UpdateUser from "./UpdateUser";
+import test from "../view/Test";
+import Test from "../view/Test";
 
 export default {
   name: "NavHead",
@@ -129,7 +133,7 @@ export default {
       avatarUrl: "https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png",
       dialogVisible: false,
       newPassword: '',
-      parentFolderId: '',
+      parentFolderId: '0',
     };
   },
   created() {
@@ -144,6 +148,10 @@ export default {
 
   },
   methods: {
+    uploadOpen() {
+      console.log("this.parentFolderId",this.parentFolderId)
+      eventBus.$emit("uploadDialog", this.parentFolderId);
+    },
     handleCommand(command) {
       if (command === "updateUser") {
         eventBus.$emit("userDialog", true);

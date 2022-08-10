@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div id="container" style="height: 1000px;"></div> <!--宽高自行设定 -->
+    <div id="container" style="height: 800px;"></div> <!--宽高自行设定 -->
     <el-button @click="saveEditor">保存</el-button>
     <el-button @click="submit">提交</el-button>
   </div>
@@ -14,6 +14,7 @@ import * as monaco from 'monaco-editor'
 import Global from "../js/global";
 
 export default {
+  props: ['fileData','language'],
   data() {
     return {
       editor: null,//文本编辑器
@@ -28,8 +29,8 @@ export default {
     initEditor() {
       // 初始化编辑器，确保dom已经渲染
       this.editor = monaco.editor.create(document.getElementById('container'), {
-        value: '',//编辑器初始显示文字
-        language: 'html',//语言支持自行查阅demo
+        value: this.fileData,//编辑器初始显示文字
+        language: 'java',//语言支持自行查阅demo
         automaticLayout: true,//自动布局
         theme: 'vs-dark', //官方自带三种主题vs, hc-black, or vs-dark
         fontSize: 17,       //字体大小
@@ -49,7 +50,7 @@ export default {
     getValue() {
       this.editor.getValue(); //获取编辑器中的文本
     },
-    async submit() {
+    submit() {
       const str = this.editor.getValue();
       const fileContent = new File([str], 'xxx', {type: ''})
       const formdata = new FormData();
@@ -68,7 +69,8 @@ export default {
         }
         that.errorMsg(rs.message);
       })
-    }
+    },
+
   }
 }
 

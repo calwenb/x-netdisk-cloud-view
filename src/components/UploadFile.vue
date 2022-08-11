@@ -38,8 +38,8 @@ export default {
       options: {
         target: 'http://localhost:8070/api/files/upload-big',
         // testChunks: false,
-        chunkSize: 1024 * 1024 * 2,  //1MB
-        simultaneousUploads: 3, //并发上传数
+        chunkSize: 1024 * 1024 * 5,  //1MB
+        simultaneousUploads: 8, //并发上传数
         headers: {
           'token': this.$cookies.get("TOKEN")
         },

@@ -116,8 +116,8 @@
         :visible.sync="drawer"
         size="50%">
         <el-card style="font-size: 15px" shadow="hover">
-          <p v-if="previewFile.type=='text'" style="white-space:pre-wrap;">{{ previewFile.data }}</p>
-          <img :src="previewFile.data" width="500px" v-if="previewFile.type=='img'"/>
+          <p v-if="previewFile.type==='text'" style="white-space:pre-wrap;">{{ previewFile.data }}</p>
+          <img :src="previewFile.data" width="500px" v-if="previewFile.type==='img'"/>
         </el-card>
       </el-drawer>
 

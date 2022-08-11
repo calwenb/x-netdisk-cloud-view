@@ -34,8 +34,8 @@ export default {
     eventBus.$on("openEditor", data => {
       this.file = data;
       console.log("this.file", this.file)
-
-
+      this.editor.setValue(this.file.data);
+      monaco.languages.register('java')
     });
   },
   mounted() {
@@ -46,7 +46,7 @@ export default {
       // 初始化编辑器，确保dom已经渲染
       this.editor = monaco.editor.create(document.getElementById('container'), {
         value: this.file.data,//编辑器初始显示文字
-        language: this.file.language,//语言支持自行查阅demo
+        language: '',//语言支持自行查阅demo
         automaticLayout: true,//自动布局
         theme: 'vs-dark', //官方自带三种主题vs, hc-black, or vs-dark
         fontSize: 17,       //字体大小
@@ -70,7 +70,7 @@ export default {
       const fileContent = new File([str], 'xxx', {type: ''})
       const formdata = new FormData();
       formdata.append('data', fileContent);
-      formdata.append("id", '397');
+      formdata.append("id", this.file.id);
       const that = this;
       this.axios({
         url: Global.SERVER_ADDRESS + '/files/data',

@@ -99,6 +99,7 @@ export default {
 
   beforeRouteEnter: (to, from, next) => {
     next(vm => {
+      // alert("后端接口已升级为微服务，项目目前处于开发测试阶段，仍会出现许多缺陷，请见谅。")
       var token = vm.$cookies.get("TOKEN");
       if (token === null) {
         vm.$router.push({path: '/login'});

@@ -100,13 +100,13 @@
           </router-link>
         </span>
       </el-menu-item>
-      <el-menu-item index="4">
+<!--      <el-menu-item index="4">
         <span slot="title">
           <router-link to="/test"><i class="el-icon-coin"></i>
             <span class="mobileHide">测试</span>
           </router-link>
         </span>
-      </el-menu-item>
+      </el-menu-item>-->
       <div>
         <el-row>
           <el-progress type="circle" :percentage="storePercen"></el-progress>

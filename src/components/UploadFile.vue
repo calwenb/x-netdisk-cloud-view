@@ -94,6 +94,7 @@ export default {
       this.dialog = true;
       this.options.query.faFolderId = data
     });
+
   },
   methods: {
     onFileAdded(file) {

@@ -8,12 +8,12 @@ function resolve(dir) {
   return path.join(__dirname, '..', dir)
 }
 
-const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
+// const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
 
 module.exports = {
-  plugins: [
-    new MonacoWebpackPlugin()
-  ],
+  // plugins: [
+  //   new MonacoWebpackPlugin()
+  // ],
   context: path.resolve(__dirname, '../'),
   entry: {
     app: './src/main.js'

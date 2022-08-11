@@ -12,15 +12,31 @@
 
 import * as monaco from 'monaco-editor'
 import Global from "../js/global";
+import eventBus from "../js/eventBus";
 
 export default {
-  props: ['fileData','language'],
+  props: ['previewFile'],
   data() {
     return {
       editor: null,//文本编辑器
       isSave: true,//文件改动状态，是否保存
-      oldValue: '' //保存后的文本
+      oldValue: '',//保存后的文本
+      file: {
+        id: '',
+        name: '',
+        language: '',
+        type: '',
+        data: ''
+      }
     }
+  },
+  created() {
+    eventBus.$on("openEditor", data => {
+      this.file = data;
+      console.log("this.file", this.file)
+
+
+    });
   },
   mounted() {
     this.initEditor();
@@ -29,8 +45,8 @@ export default {
     initEditor() {
       // 初始化编辑器，确保dom已经渲染
       this.editor = monaco.editor.create(document.getElementById('container'), {
-        value: this.fileData,//编辑器初始显示文字
-        language: 'java',//语言支持自行查阅demo
+        value: this.file.data,//编辑器初始显示文字
+        language: this.file.language,//语言支持自行查阅demo
         automaticLayout: true,//自动布局
         theme: 'vs-dark', //官方自带三种主题vs, hc-black, or vs-dark
         fontSize: 17,       //字体大小
@@ -46,7 +62,6 @@ export default {
     saveEditor() {
       this.oldValue = this.editor.getValue();
     },
-
     getValue() {
       this.editor.getValue(); //获取编辑器中的文本
     },

@@ -135,8 +135,7 @@
 
         <el-card style="font-size: 15px" shadow="hover">
           <p v-if="previewFile.type==='text'" style="white-space:pre-wrap;">
-            <editor :fileData="previewFile.data"></editor>
-            <!--            {{ previewFile.data }}-->
+            <editor :previewFile="previewFile"></editor>
           </p>
           <img :src="previewFile.data" width="500px" v-if="previewFile.type=='img'"/>
         </el-card>
@@ -180,9 +179,13 @@ export default {
   data() {
     return {
       title: '全部文件',
+      language: 'java',
       shareMsg: '',
       drawer_qrcode: false,
       previewFile: {
+        id: '',
+        name: '',
+        language: '',
         type: '',
         data: ''
       },
@@ -362,12 +365,12 @@ export default {
       const that = this;
       this.download(row, true, (rs) => {
         if (rs !== false) {
-          that.filePreview(rs, row.type);
+          that.filePreview(rs, row);
           this.drawer = true;
         }
       });
     },
-    filePreview(file, type) {
+    filePreview(file, row) {
 
       let self = this;
       // 看支持不支持FileReader
@@ -378,23 +381,26 @@ export default {
       //if (/^image/.test(file.type)) {
       // 创建一个reader
       let reader = new FileReader();
-      if (type === "图片") {
+      if (row.type === "图片") {
         // 将图片将转成 base64 格式
         reader.readAsDataURL(file);
         self.previewFile.type = 'img';
-      } else if (type === "文档") {
+      } else if (row.type === "文档") {
         // reader.readAsText(file, 'GB2312');
         reader.readAsText(file, 'utf-8');
         self.previewFile.type = 'text';
-      } else if (type === "代码") {
+      } else if (row.type === "代码") {
         reader.readAsText(file);
         self.previewFile.type = 'text';
-      } else {
-
       }
       // 读取成功后的回调
       reader.onloadend = function () {
         self.previewFile.data = this.result;
+        //todo
+        self.previewFile.id = row.myFileId;
+        self.previewFile.name = row.myFileName;
+        self.previewFile.language = 'java';
+        eventBus.$emit("openEditor", self.previewFile);
       }
     },
     download(row, preview, callback) {

@@ -1,8 +1,8 @@
 @font-face {
   font-family: "iconfont"; /* Project id 3542556 */
-  src: url('iconfont.woff2?t=1659368232576') format('woff2'),
-       url('iconfont.woff?t=1659368232576') format('woff'),
-       url('iconfont.ttf?t=1659368232576') format('truetype');
+  src: url('iconfont.woff2?t=1660317138757') format('woff2'),
+       url('iconfont.woff?t=1660317138757') format('woff'),
+       url('iconfont.ttf?t=1660317138757') format('truetype');
 }
 
 .iconfont {
@@ -11,6 +11,42 @@
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-queren:before {
+  content: "\e65a";
+}
+
+.icon-queren1:before {
+  content: "\e65b";
+}
+
+.icon-iconzhengli-:before {
+  content: "\e65c";
+}
+
+.icon-Icon-queren:before {
+  content: "\e65d";
+}
+
+.icon-tijiaochenggong:before {
+  content: "\e72e";
+}
+
+.icon-queren2:before {
+  content: "\e65e";
+}
+
+.icon-tijiaoqueren:before {
+  content: "\e660";
+}
+
+.icon-queren3:before {
+  content: "\e6c6";
+}
+
+.icon-querenmima:before {
+  content: "\e663";
 }
 
 .icon-wenjian:before {

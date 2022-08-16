@@ -3,7 +3,7 @@
     title="上传文件"
     :visible.sync="dialog"
     :modal="false"
-    width="5000">
+    width="100vh">
     <uploader
       ref="uploader"
       :options="options"
@@ -27,8 +27,8 @@
 <script>
 import axios from 'axios';
 import SparkMD5 from 'spark-md5';
-import eventBus from "../js/eventBus";
-import Global from "../js/global";
+import eventBus from "../../js/eventBus";
+import Global from "../../js/global";
 
 export default {
   name: "UploadFile",
@@ -36,10 +36,9 @@ export default {
     return {
       dialog: false,
       options: {
-        target: 'http://localhost:8070/api/files/upload-big',
-        // testChunks: false,
-        chunkSize: 1024 * 1024 * 5,  //1MB
-        simultaneousUploads: 8, //并发上传数
+        target: Global.SERVER_ADDRESS + '/files/upload-big',
+        chunkSize: 1024 * 1024 * 20,  //10MB
+        simultaneousUploads: 4, //并发上传数
         headers: {
           'token': this.$cookies.get("TOKEN")
         },
@@ -61,8 +60,7 @@ export default {
         checkChunkUploadedByResponse: (chunk, rs) => {
           rs = JSON.parse(rs);
           if (rs.data === 1) {
-            console.log("秒传成功")
-            this.statusTextMap.success = '秒传文件';
+            // this.statusTextMap.success = '秒传文件';
             return true;
           } else {
             this.statusTextMap.success = '';
@@ -90,7 +88,6 @@ export default {
   },
   created() {
     eventBus.$on("uploadDialog", data => {
-      console.log("data", data)
       this.dialog = true;
       this.options.query.faFolderId = data
     });
@@ -98,13 +95,16 @@ export default {
   },
   methods: {
     onFileAdded(file) {
+      this.$notify.info({
+        title: '消息',
+        message: '正在计算md5中，请稍后'
+      });
       // 计算MD5
       this.computeMD5(file);
     },
 
     //计算MD5
     computeMD5(file) {
-      console.log(this.options.query)
       let blobSlice = File.prototype.slice || File.prototype.mozSlice || File.prototype.webkitSlice,
         chunkSize = 2097152,
         chunks = Math.ceil(file.size / chunkSize),
@@ -124,9 +124,8 @@ export default {
           file.cmd5progress = percent;
           loadNext();
         } else {
-          console.log('finished loading');
           let md5 = spark.end();
-          console.log(`MD5计算完成：${file.name} \nMD5：${md5} \n分片：${chunks} 大小:${file.size} 用时：${new Date().getTime() - time} ms`);
+          // console.log(`MD5计算完成：${file.name} \nMD5：${md5} \n分片：${chunks} 大小:${file.size} 用时：${new Date().getTime() - time} ms`);
           spark.destroy(); //释放缓存
           file.uniqueIdentifier = md5; //将文件md5赋值给文件唯一标识
           file.cmd5 = false; //取消计算md5状态
@@ -147,7 +146,7 @@ export default {
     },
     // 文件进度的回调
     onFileProgress(rootFile, file, chunk) {
-      console.log(`上传中 ${file.name}，chunk：${chunk.startByte / 1024 / 1024} ~ ${chunk.endByte / 1024 / 1024}`)
+      // console.log(`上传中 ${file.name}，chunk：${chunk.startByte / 1024 / 1024} ~ ${chunk.endByte / 1024 / 1024}`)
     },
 
     onFileSuccess(rootFile, file, response, chunk) {
@@ -163,7 +162,7 @@ export default {
         filename: file.name,
         'faFolderId': this.options.query.faFolderId,
       }).then(function (res) {
-        that.successMsg(file.name + " ,上传成功");
+        that.successMsg(file.name + " ，上传成功");
       }).catch(function (error) {
         console.log(error);
       });
@@ -187,7 +186,6 @@ export default {
 }
 
 .uploader {
-  width: 880px;
   padding: 15px;
   margin: -30px auto 0;
   font-size: 14px;

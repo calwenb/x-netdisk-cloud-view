@@ -16,8 +16,8 @@
 </template>
 
 <script>
-import Global from "../js/global";
-import eventBus from "../js/eventBus";
+import Global from "../../js/global";
+import eventBus from "../../js/eventBus";
 
 export default {
   name: "Search",

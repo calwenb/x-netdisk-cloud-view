@@ -1,6 +1,16 @@
 <template>
   <div class="main">
-    <h4>{{ type }}</h4>
+    <h4>{{ title }}</h4>
+    <el-button plain @click="backToRoot" circle>
+      <svg class="icon" aria-hidden="true">
+        <use xlink:href="#icon-zhuye"></use>
+      </svg>
+    </el-button>
+    <el-button plain @click="backToPrevious" circle>
+      <svg class="icon" aria-hidden="true">
+        <use xlink:href="#icon-xingzhuanggongnengtubiao-"></use>
+      </svg>
+    </el-button>
     <el-button plain @click="refresh" circle>
       <svg class="icon" aria-hidden="true">
         <use xlink:href="#icon-shuaxin"></use>
@@ -11,6 +21,12 @@
         <use xlink:href="#icon-shanchu2"></use>
       </svg>
     </el-button>
+    <el-button @click="folderTreeOpen" circle>
+      <svg class="icon" aria-hidden="true">
+        <use xlink:href="#icon-shuzhuangtu2"></use>
+      </svg>
+    </el-button>
+    <folder-tree></folder-tree>
 
     <el-divider></el-divider>
     <div class="table">
@@ -29,7 +45,7 @@
           prop="myFileName"
           label="文件名"
           sortable
-          width="550">
+          width="400">
           <template slot-scope="scope">
             <span style="margin-left: 10px" v-if="scope.row.myFileName!=null" class="pointer"
                   @click="preview(scope.row)">
@@ -71,7 +87,7 @@
           prop="updateTime"
           label="修改日期"
           sortable
-          width="250"
+          width="200"
           :formatter="formDate">
         </el-table-column>
 
@@ -111,13 +127,16 @@
     </div>
     <div>
 
+
       <el-drawer
-        title="文件浏览"
+        title="内容展示"
         :visible.sync="drawer"
-        size="50%">
+        size="60%">
         <el-card style="font-size: 15px" shadow="hover">
-          <p v-if="previewFile.type==='text'" style="white-space:pre-wrap;">{{ previewFile.data }}</p>
-          <img :src="previewFile.data" width="500px" v-if="previewFile.type==='img'"/>
+          <p v-if="previewFile.type==='text'" style="white-space:pre-wrap;">
+            <editor></editor>
+          </p>
+          <img :src="previewFile.data" width="500px" v-if="previewFile.type=='img'"/>
         </el-card>
       </el-drawer>
 
@@ -142,19 +161,29 @@
 
 
 <script>
-import Global from "../../js/global";
-import eventBus from "../../js/eventBus";
+import Global from "../../../js/global";
+import eventBus from "../../../js/eventBus";
 import QRCode from "qrcodejs2"
 import fileDownload from "js-file-download";
+import folderTree from "../../../components/file/FolderTree";
+import Editor from "../../../components/file/Editor";
 
 
 export default {
-  name: "FilesType",
+  name: "AllFiles",
+  components: {
+    "folderTree": folderTree,
+    "editor": Editor
+  },
   data() {
     return {
+      title: '全部文件',
+      language: 'java',
       shareMsg: '',
       drawer_qrcode: false,
       previewFile: {
+        id: '',
+        name: '',
         type: '',
         data: ''
       },
@@ -166,19 +195,43 @@ export default {
         myFilePath: '',
         downloadCount: '',
         updateTime: '',
-        parentFolderId: '0',
+        parentFolderId: '',
         size: '',
         type: ''
       }],
-      parentFolderId: "0",
-      type: '',
+      parentFolderId: '0',
+      previousPFID: '0',
+      bookPFID: [0],
       multipleSelection: [],
       search: '',
-      loading: true
+      loading: true,
     }
   },
-
+  created() {
+    eventBus.$on("refresh", data => {
+      if (data === "do") {
+        this.refresh();
+      }
+    })
+    eventBus.$on("searData", data => {
+      this.myFileList = data;
+      this.title = "搜索文件";
+    })
+    eventBus.$on("folderData", data => {
+      this.getMyFileList(this, data);
+    })
+  },
   methods: {
+    folderTreeOpen() {
+      eventBus.$emit("folderTreeDialog", true);
+    },
+    //返回上一个文件夹
+    backToPrevious() {
+      if (this.bookPFID.length > 1) {
+        this.bookPFID.pop();
+      }
+      this.getMyFileList(this, this.bookPFID[this.bookPFID.length - 1]);
+    },
     shareOpen(row) {
       let that = this;
       this.$confirm('分享生成临时文件?', '提示', {
@@ -230,88 +283,118 @@ export default {
         colorLight: "#ffffff", //二维码背景色
       })
     },
-    getList(that) {
-      that.loading = true;
-      const type = that.$route.params.type;
-      that.type = type;
-      that.axios({
-        url: Global.SERVER_ADDRESS + '/files',
+    updateOpen(row) {
+      const that = this;
+      this.$prompt('输入新文件名', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+      }).then(({value}) => {
+        that.updateFile(row, value);
+      }).catch((msg) => {
+        this.$message({
+          type: 'info',
+          message: '取消输入'
+        });
+      });
+    },
+    updateFile(row, value) {
+      let newName;
+      let that = this;
+      let url = Global.SERVER_ADDRESS + '/files/' + row.myFileId;
+      if (row.fileFolderId != null) {
+        newName = value;
+        url = Global.SERVER_ADDRESS + '/folders/' + row.fileFolderId;
+      } else {
+        let oldName = row.myFileName + "";
+        let suffix = oldName.substring(oldName.lastIndexOf("."));
+        newName = value + suffix
+      }
+      this.axios({
+        url: url,
         params: {
-          type: that.type,
-          page: 1,
+          newName: newName,
+        },
+        method: 'PUT',
+      }).then(function (rsp) {
+        that.notification(true, rsp.data);
+        that.refresh();
+      })
+    },
+    backToRoot() {
+      this.getMyFileList(this, 0, false, true);
+    },
+
+    refresh() {
+      this.getMyFileList(this, this.parentFolderId);
+    },
+    openFolder(FolderId) {
+      this.getMyFileList(this, FolderId, true);
+    },
+    getMyFileList(that, FolderId, openFolder, toRoot) {
+      that.title = "全部文件";
+      that.loading = true;
+      eventBus.$emit("FolderId", FolderId);
+      const token = that.$cookies.get("TOKEN");
+      if (token === null) {
+        that.$router.push({path: '/login'});
+      }
+      that.axios({
+        url: Global.SERVER_ADDRESS + '/files/file-folder',
+        params: {
+          parentFolderId: FolderId,
         },
         method: 'GET',
       }).then(function (rs) {
-        that.myFileList = rs.data;
-        that.loading = false;
-      })
-    },
-    refresh() {
-      this.getList(this);
-    },
-    handleCurrentChange(val) {
-      const token = this.$cookies.get("TOKEN");
-      if (token === null) {
-        this.$router.push({path: '/login'});
-      }
-      const type = this.$route.params.type;
-      this.type = type;
-      const that = this;
-      this.axios({
-        url: Global.SERVER_ADDRESS + '/file/queryFilesByType/' + that.type + '/P/' + val,
-        params: {},
-        method: 'GET',
-      }).then(function (rs) {
-        let data = rs.data;
-        if (data.code === '200') {
-          let files = JSON.parse(data.msg);
-          that.myFileList = files;
-        } else {
-          that.$message.error(data.msg);
+        let files = rs.data;
+        that.myFileList = files;
+        that.previousPFID = that.parentFolderId;
+        that.parentFolderId = FolderId;
+        if (openFolder === true) {
+          that.bookPFID.push(FolderId);
         }
-      }).catch(function (error) {
-        that.$message.error(error);
+        if (toRoot == true) {
+          that.bookPFID = [0];
+        }
+        that.loading = false;
       })
     },
     preview(row) {
       const that = this;
       this.download(row, true, (rs) => {
         if (rs !== false) {
-          that.filePreview(rs, row.type);
+          that.filePreview(rs, row);
           this.drawer = true;
         }
       });
     },
-    filePreview(file, type) {
+    filePreview(file, row) {
       let self = this;
       // 看支持不支持FileReader
       if (!file || !window.FileReader) {
         return;
       }
 
-      //if (/^image/.test(file.type)) {
-      // 创建一个reader
       let reader = new FileReader();
-      if (type === "图片") {
-        // 将图片将转成 base64 格式
+      if (row.type === "图片") {
         reader.readAsDataURL(file);
         self.previewFile.type = 'img';
-      } else if (type === "文档") {
+      } else if (row.type === "文档") {
         reader.readAsText(file, 'utf-8');
         self.previewFile.type = 'text';
-      } else if (type === "代码") {
+      } else if (row.type === "代码") {
         reader.readAsText(file);
         self.previewFile.type = 'text';
-      } else {
-
       }
       // 读取成功后的回调
       reader.onloadend = function () {
         self.previewFile.data = this.result;
+        self.previewFile.id = row.myFileId;
+        self.previewFile.name = row.myFileName;
+        eventBus.$emit("openEditor", self.previewFile);
       }
     },
     download(row, preview, callback) {
-      let fileIdList = [];
+      let fileIdList = new Array();
       fileIdList.push(row.myFileId);
       this.$message('正在获取文件，请不要重复点击，稍等...');
       const that = this;
@@ -368,43 +451,70 @@ export default {
     },
     delOpen(row) {
       const that = this;
-      this.$confirm('此操作将移至回收站（保留7天）, 是否继续?', '提示', {
+      this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        if (row === null) {
-          this.delSelect(that);
-        } else {
-          this.handleClick(row);
+          /*是否多选*/
+          if (row === null) {
+            this.delSelect(that);
+          } else {
+            /*删除的是否为文件夹*/
+            if (row.fileFolderId != null) {
+              this.handleClick(row);
+            } else {
+              this.handleClick(row);
+            }
+          }
         }
-      }).catch(function (error) {
+      ).catch(function (error) {
         console.log(error)
         that.$message({
           type: 'info',
           message: '已取消删除'
         });
       })
-    },
+    }
+    ,
     delSelect: function (thiss) {
+      if (thiss.multipleSelection.length == 0) {
+        thiss.$message.error("请选择要删除的文件");
+        return;
+      }
       let fileIdList = new Array();
       for (const ms of thiss.multipleSelection) {
+        if (ms.myFileId == null) {
+          thiss.$message.error("多选不能删除文件夹");
+          return;
+        }
         fileIdList.push(ms.myFileId);
       }
       thiss.delFile(fileIdList);
-    },
+    }
+    ,
     handleClick: function (row) {
-      let fileIdList = new Array();
-      fileIdList.push(row.myFileId);
-      this.delFile(fileIdList);
+      let list = new Array();
+      if (row.fileFolderId != null) {
+        list.push(row.fileFolderId);
+        this.delFile(list, 'folder');
+      } else {
+        list.push(row.myFileId);
+        this.delFile(list);
+      }
     },
-    delFile: function (fileIdList) {
+    delFile: function (list, type) {
+      /*默认删除文件*/
+      let url = Global.SERVER_ADDRESS + '/files/ids'
+      if (type === 'folder') {
+        url = Global.SERVER_ADDRESS + '/folders/ids';
+      }
 
       const that = this;
       this.axios({
-        url: Global.SERVER_ADDRESS + '/files/ids',
+        url: url,
         params: {
-          IdList: JSON.stringify(fileIdList),
+          IdList: JSON.stringify(list),
         },
         method: 'DELETE',
       }).then(function (rs) {
@@ -436,14 +546,10 @@ export default {
     }
     ,
   },
-  watch: {
-    '$route'(to, from) {
-      this.getList(this)
-    }
-  },
   beforeRouteEnter: (to, from, next) => {
     next(vm => {
-      vm.getList(vm)
+      vm.getMyFileList(vm, 0);
+      vm.token = vm.$cookies.get("TOKEN");
     });
   }
 }

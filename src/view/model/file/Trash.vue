@@ -49,9 +49,8 @@
 </template>
 
 <script>
-import Global from "../../js/global";
+import Global from "../../../js/global";
 import fileDownload from "js-file-download";
-import QRCode from "qrcodejs2";
 
 export default {
   name: "Trash",
@@ -173,7 +172,6 @@ export default {
         },
         method: 'GET',
       }).then(function (rs) {
-        console.log("rs", rs)
         let data = rs.data;
         if (data === null) {
           that.fileList = "";

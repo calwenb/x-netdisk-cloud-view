@@ -2,7 +2,8 @@
   <el-dialog
     title="修改信息"
     :visible.sync="userDialog"
-    class="pwdDialog">
+    class="pwdDialog"
+    append-to-body>
     <upload-head :userId="user.userId" :avatarUrl="avatarUrl"/>
     <el-form :model="form" status-icon ref="form" label-width="100px" class="demo-ruleForm">
       <el-form-item label="昵称">
@@ -25,9 +26,9 @@
 </template>
 
 <script>
-import eventBus from "../js/eventBus";
-import Global from "../js/global";
-import UploadHead from "./UploadHead";
+import eventBus from "../../js/eventBus";
+import Global from "../../js/global";
+import UploadHead from "../nav/UploadHead";
 
 export default {
   name: "UpdateUser",
@@ -50,7 +51,7 @@ export default {
       const that = this;
       this.axios({
         url: Global.SERVER_ADDRESS + '/users/' + that.user.userId,
-        params: {
+        data: {
           userName: that.form.userName,
           phoneNumber: that.form.phoneNumber,
           email: that.form.email,

@@ -37,86 +37,66 @@
 
       <el-table
         v-loading="loading"
-        :data="storeList.filter(data => !search || data.userName.toLowerCase().includes(search.toLowerCase()))"
+        :data="userList.filter(data => !search || data.myFileName.toLowerCase().includes(search.toLowerCase()))"
         style="width: 100%;margin-bottom: 10%"
         :default-sort="{prop: 'date', order: 'descending'}"
         @selection-change="handleSelectionChange">
 
         <el-table-column
-          prop="storeId"
-          label="仓库id"
+          prop="userId"
+          label="id"
+          sortable
+          width="80">
+        </el-table-column>
+
+        <el-table-column
+          prop="userName"
+          label="用户名"
           sortable
           width="150">
         </el-table-column>
+
         <el-table-column
-          prop="user.id"
-          label="用户id"
+          prop="loginName"
+          label="账号"
+          sortable
+          width="150">
+        </el-table-column>
+
+        <el-table-column
+          prop="passWord"
+          label="密码"
           sortable
           width="200">
         </el-table-column>
 
+        <el-table-column
+          prop="userType"
+          label="身份"
+          sortable
+          width="80">
+        </el-table-column>
 
         <el-table-column
-          prop="user.userName"
-          label="用户名"
+          prop="phoneNumber"
+          label="电话"
           sortable
           width="200">
         </el-table-column>
 
         <el-table-column
-          prop="currentSize"
-          label="已使用"
+          prop="email"
+          label="邮箱"
           sortable
-          :formatter="currentSize"
           width="200">
         </el-table-column>
 
         <el-table-column
-          prop="maxSize"
-          label="总容量"
-          sortable
-          :formatter="maxSize"
-          width="200">
-        </el-table-column>
-
-        <el-table-column
-          prop="user.userType"
-          label="vip等级"
-          :formatter="typeSize"
+          prop="registerTime"
+          label="注册日期"
           sortable
           width="250">
-          <template slot-scope="scope">
-            <div slot="reference" class="name-wrapper">
-              <!--              <el-tag size="medium" >{{ scope.row.user.userType%10 }}</el-tag>
-                            <el-button >{{scope.row.user.userType>10?'去':''}}</el-button>-->
-              <svg class="iconVip" aria-hidden="true" v-if="scope.row.user.userType%10===2">
-                <use xlink:href="#icon-chuangxiangbaiyinvip"></use>
-              </svg>
-              <svg class="iconVip" aria-hidden="true" v-if="scope.row.user.userType%10===3">
-                <use xlink:href="#icon-chuangxianghuangjinvip"></use>
-              </svg>
-              <svg class="iconVip" aria-hidden="true" v-if="scope.row.user.userType%10===4">
-                <use xlink:href="#icon-chuangxiangzijinvip"></use>
-              </svg>
-              <svg class="iconVip" aria-hidden="true" v-if="scope.row.user.userType%10===5">
-                <use xlink:href="#icon-chuangxiangzuanshivip"></use>
-              </svg>
-              <svg class="iconVip" aria-hidden="true" v-if="scope.row.user.userType%10===6">
-                <use xlink:href="#icon-huaban"></use>
-              </svg>
-              <el-button v-if="scope.row.user.userType>10" circle @click="upLevel(scope.row.user.id)" size="mini">
-                <svg class="icon" aria-hidden="true">
-                  <use xlink:href="#icon-chixushengji"></use>
-                </svg>
-
-              </el-button>
-
-
-            </div>
-          </template>
-
         </el-table-column>
-
 
         <el-table-column
           fixed="right"
@@ -157,14 +137,13 @@
 </template>
 
 <script>
-import Global from "../../js/global";
-import eventBus from "../../js/eventBus";
-import AdminAddD from "../../components/admin/AdminAddD";
-import AdminUpD from "../../components/admin/AdminUpD";
-import el from "element-ui/src/locale/lang/el";
+import Global from "../../../js/global";
+import eventBus from "../../../js/eventBus";
+import AdminAddD from "../../../components/admin/AdminAddD";
+import AdminUpD from "../../../components/admin/AdminUpD";
 
 export default {
-  name: "StoreMsg",
+  name: "AdminUserMsg",
   components: {
     'adminAddD': AdminAddD,
     'adminUpD': AdminUpD,
@@ -174,18 +153,16 @@ export default {
       accTerm: false,
       term: 'id',
       keyword: '',
-      storeList: [{
-        storeId: '',
-
-        currentSize: '',
-        maxSize: '',
-        user: {
-          userId: '',
-          userName: '',
-          userType: '',
-        }
+      userList: [{
+        userId: '',
+        userName: '',
+        loginName: '',
+        passWord: '',
+        userType: '',
+        phoneNumber: '',
+        email: '',
+        registerTime: '',
       }],
-
       multipleSelection: [],
       search: '',
       loading: true,
@@ -193,61 +170,60 @@ export default {
   },
   methods: {
     updateOpen(row) {
-      console.log(row);
       eventBus.$emit("upUserDialog", row);
     },
     addOpen() {
       eventBus.$emit("addDialog", true);
     },
-    /* searchData() {
-       let keyword = this.keyword;
-       if (keyword === '') {
-         this.$message.error("请输入要搜索文件的关键字");
-         return;
-       }
-       var rule = /[`~!@#$%^&*()_+=<>?:"{}|,.\/;'\\[\]·~！@#￥%……&*（）——\-+={}|《》？：“”【】、；‘'，。、]/im;
-       if (keyword === "" || rule.test(keyword)) {
-         this.$message.error("禁止输入特殊符号");
-         return;
-       }
-       const that = this
-       this.axios({
-         url: Global.SERVER_ADDRESS + "/admin/search_user",
-         params: {
-           term: that.term,
-           value: that.keyword,
-           accurate: that.accTerm
+    searchData() {
+      let keyword = this.keyword;
+      if (keyword === '') {
+        this.$message.error("请输入要搜索文件的关键字");
+        return;
+      }
+      var rule = /[`~!@#$%^&*()_+=<>?:"{}|,.\/;'\\[\]·~！@#￥%……&*（）——\-+={}|《》？：“”【】、；‘'，。、]/im;
+      if (keyword === "" || rule.test(keyword)) {
+        this.$message.error("禁止输入特殊符号");
+        return;
+      }
+      const that = this
+      this.axios({
+        url: Global.SERVER_ADDRESS + "/admins/search-user",
+        params: {
+          term: that.term,
+          value: that.keyword,
+          accurate: that.accTerm
 
-         }
-       }).then(function (rs) {
-         const reUsers = rs.data;
-         for (let i = 0; i < reUsers.length; i++) {
-           rs
-           reUsers[i]["userId"] = reUsers[i]["id"];
-         }
-         that.userList = reUsers;
-         that.loading = false;
-         eventBus.$emit("searData", rs.data);
+        }
+      }).then(function (rs) {
+        const reUsers = rs.data;
+        for (let i = 0; i < reUsers.length; i++) {
+          reUsers[i]["userId"] = reUsers[i]["id"];
+        }
+        that.userList = reUsers;
+        that.loading = false;
+        eventBus.$emit("searData", rs.data);
 
-       })
-     },*/
+      })
+    },
     getList(that) {
       that.loading = true;
+      const token = that.$cookies.get("TOKEN");
+      if (token === null) {
+        that.$router.push({path: '/login'});
+      }
       that.axios({
-        url: Global.SERVER_ADDRESS + '/stores/user-store',
+        url: Global.SERVER_ADDRESS + '/admins/users',
         params: {},
         method: 'GET',
       }).then(function (rs) {
-
-        const reStore = rs.data;
-        for (let i = 0; i < reStore.length; i++) {
-          // reStore[i]["userName"] = reStore[i]["user"]["userName"];
-          reStore[i]["storeId"] = reStore[i]["fileStoreId"]
-
+        const reUsers = rs.data;
+        for (let i = 0; i < reUsers.length; i++) {
+          reUsers[i]["userId"] = reUsers[i]["id"];
         }
-        that.storeList = reStore;
+        that.userList = reUsers;
         that.loading = false;
-        console.log("55", that.storeList)
+
       })
     },
     updateDialog(row) {
@@ -304,30 +280,19 @@ export default {
     handleSelectionChange(val) {
       this.multipleSelection = val;
     },
-    currentSize(row) {
-      return Math.ceil(row.currentSize / 1024 + 0.5).toFixed(0) + " MB";
+    formSize(row) {
+      return Math.ceil(row.size / 1024).toFixed(0) + " KB";
     },
-    maxSize(row) {
-      return Math.ceil(row.maxSize / 1024 + 0.5).toFixed(0) + " MB";
+    formDate(row) {
+      let time = new Date(row.updateTime);
+      let year = time.getFullYear();
+      let month = time.getMonth() + 1;
+      let date = time.getDate();
+      let h = time.getHours();
+      let m = time.getMinutes();
+      let s = time.getSeconds();
+      return year + "-" + month + "-" + date + " " + h + ":" + m + ":" + s;
     },
-    typeSize(row) {
-      if (userType > 10) {
-        return " 等级申请";
-      }
-    },
-    upLevel(userId) {
-      let that = this
-      that.axios({
-        url: Global.SERVER_ADDRESS + '/admins/up-level',
-        params: {
-          uid: userId
-        },
-        method: 'PUT',
-      }).then(function (rs) {
-        that.getList(that);
-        that.successMsg(rs.message)
-      })
-    }
 
   },
   beforeRouteEnter: (to, from, next) => {
@@ -339,12 +304,6 @@ export default {
 </script>
 
 <style scoped>
-.iconVip {
-  width: 5em;
-  height: 5em;
-  vertical-align: 5em;
-}
-
 .main {
   text-align: left;
   padding: 0 2%;
@@ -373,4 +332,8 @@ body {
   margin: 0;
 }
 
+.pointer:hover {
+  cursor: pointer;
+  color: #409EFF;
+}
 </style>

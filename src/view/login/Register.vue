@@ -5,13 +5,13 @@
         <router-link to="/login">
           <el-button circle title="去登录">
             <svg class="icon" aria-hidden="true">
-              <use xlink:href="#icon-denglu-yonghu"></use>
+              <use xlink:href="#icon-yonghudenglu"></use>
             </svg>
           </el-button>
         </router-link>
         <el-divider direction="vertical"></el-divider>
         <router-link to="/getshare">
-          <el-button  circle title="获取分享文件">
+          <el-button circle title="获取分享文件">
             <svg class="icon" aria-hidden="true">
               <use xlink:href="#icon-fenxiang7"></use>
             </svg>
@@ -19,24 +19,19 @@
         </router-link>
       </div>
 
-      <h3>重置密码</h3>
+      <h3>注册</h3>
 
       <el-form :model="ruleForm" status-icon :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
-
-        <el-form-item label="账号" prop="loginName">
-          <el-input v-model="ruleForm.loginName"></el-input>
+        <el-form-item label="昵称" prop="userName">
+          <el-input v-model="ruleForm.userName"></el-input>
         </el-form-item>
-
         <el-form-item label="邮箱" prop="email">
           <el-input v-model="ruleForm.email" placeholder=""></el-input>
         </el-form-item>
 
-        <el-form-item label="验证码" prop="code">
-          <el-input v-model="ruleForm.code">
-            <el-button slot="append" size="mini" @click="sendCode">发送验证码</el-button>
-          </el-input>
+        <el-form-item label="账号" prop="loginName">
+          <el-input v-model="ruleForm.loginName"></el-input>
         </el-form-item>
-
         <el-form-item label="密码" prop="pass">
           <el-input type="password" v-model="ruleForm.pass" autocomplete="off"></el-input>
         </el-form-item>
@@ -62,15 +57,16 @@
 </template>
 
 <script>
-import Global from "../js/global";
+import Global from '../../js/global'
 
 export default {
-  name: "Repwd",
+  name: "Register",
   data() {
     var checkAge = (rule, value, callback) => {
       if (!value) {
         return callback(new Error('账号'));
       }
+
     };
     var validatePass = (rule, value, callback) => {
       if (value === '') {
@@ -92,11 +88,10 @@ export default {
       }
     };
     return {
-      verifyCode: "",
       ruleForm: {
         loginName: '',
         email: '',
-        code: '',
+        userName: '',
         pass: '',
         checkPass: '',
       },
@@ -111,54 +106,33 @@ export default {
       }
     };
   },
+
   methods: {
-    sendCode() {
+    register() {
       var that = this;
       this.axios({
-        url: Global.SERVER_ADDRESS + '/users/send-code',
-        params: {
-          loginName: this.ruleForm.loginName,
+        url: Global.SERVER_ADDRESS + '/users/register',
+        data:{
+          userName: this.ruleForm.userName,
           email: this.ruleForm.email,
-          password: this.ruleForm.pass
-        },
-        method: 'POST',
-      })
-    },
-    repwd() {
-      var that = this;
-      this.axios({
-        url: Global.SERVER_ADDRESS + '/users/re-pwd',
-        params: {
           loginName: this.ruleForm.loginName,
-          password: this.ruleForm.pass,
-          code: this.ruleForm.code
+          passWord: this.ruleForm.pass
         },
         method: 'POST',
       }).then(function (rs) {
-        that.notification(true, rs.data + " 正在去登录页面...");
-        setTimeout(function () {
-            that.$router.push({path: '/login'});
-          },
-          3000,
-        );
-
+        that.$cookies.set("TOKEN", rs.data, Global.COOKIES_TIME);
+        that.$router.push({path: '/index'})
       })
     },
     submitForm(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          this.repwd();
+          this.register();
         }
       });
     },
     resetForm(formName) {
       this.$refs[formName].resetFields();
-    }
-  },
-  created() {
-    let loginName = this.$route.params.loginName;
-    if (loginName !== undefined) {
-      this.ruleForm.loginName = loginName;
     }
   }
 }
@@ -178,7 +152,7 @@ export default {
   position: fixed;
   width: 100%;
   height: 100%;
-  background: url('../img/login_bg.png');
+  background: url('../../img/login_bg.png');
   display: flex;
   justify-content: center;
   align-items: center;
@@ -219,5 +193,3 @@ export default {
   }
 }
 </style>
-
-

@@ -55,8 +55,7 @@
 </template>
 
 <script>
-import Global from '../js/global'
-import QRCode from 'qrcodejs2'
+import Global from '../../js/global'
 
 
 export default {
@@ -123,9 +122,9 @@ export default {
       var that = this;
       this.axios({
         url: Global.SERVER_ADDRESS + '/users/login',
-        params: {
+        data:{
           loginName: this.ruleForm.userName,
-          password: this.ruleForm.pass,
+          passWord: this.ruleForm.pass,
           remember: that.remember,
         },
         method: 'POST',
@@ -162,7 +161,7 @@ export default {
   position: fixed;
   width: 100%;
   height: 100%;
-  background: url('../img/login_bg.png');
+  background: url('../../img/login_bg.png');
   display: flex;
   justify-content: center;
   align-items: center;

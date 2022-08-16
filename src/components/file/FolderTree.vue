@@ -1,11 +1,11 @@
 <template>
   <div>
-
     <el-dialog
-      title="相册树"
+      title="目录树"
       :visible.sync="dialog"
-      class="pwdDialog">
-
+      class="pwdDialog"
+      :modal="false"
+      append-to-body>
       <el-tree :data="data" :props="defaultProps" default-expand-all=true highlight-current=true
                icon-class="el-icon-caret-right"
                @node-click="handleNodeClick"></el-tree>
@@ -14,8 +14,8 @@
 </template>
 
 <script>
-import Global from "../js/global";
-import eventBus from "../js/eventBus";
+import Global from "../../js/global";
+import eventBus from "../../js/eventBus";
 
 export default {
   name: "FolderTree",
@@ -32,7 +32,6 @@ export default {
   },
   created() {
     eventBus.$on("folderTreeDialog", data => {
-      console.log("3333")
       if (data) {
         this.getTree();
       }
@@ -41,7 +40,6 @@ export default {
   },
   methods: {
     handleNodeClick(data) {
-      console.log(data);
       eventBus.$emit("folderData", data.id);
     },
     getTree() {
@@ -50,9 +48,7 @@ export default {
         url: Global.SERVER_ADDRESS + '/folders/tree',
         method: 'GET',
       }).then(function (rs) {
-        console.log(that.data)
         that.data = [rs.data];
-        console.log(that.data)
         that.dialog = true;
       })
     },

@@ -1,23 +1,39 @@
 <template>
-  <div>
-    <div id="container" style="height: 800px;"></div> <!--宽高自行设定 -->
-    <el-button @click="saveEditor">保存</el-button>
-    <el-button @click="submit">提交</el-button>
+  <div style="height: 80vh;margin-top: -3vh;padding-bottom: 4vh;">
+    <div id="container"></div>
+    <el-button plain @click="submit" circle style="float: right;" title="提交">
+      <svg class="icon" aria-hidden="true">
+        <use xlink:href="#icon-tijiaochenggong"></use>
+      </svg>
+    </el-button>
   </div>
 
 </template>
 
 <script>
-
-
 import * as monaco from 'monaco-editor'
-import Global from "../js/global";
-import eventBus from "../js/eventBus";
+import Global from "../../js/global";
+import eventBus from "../../js/eventBus";
 
 export default {
-  props: ['previewFile'],
   data() {
     return {
+      languageMap: {
+        '.py': 'python',
+        '.java': 'java',
+        '.go': 'go',
+        '.c': 'cpp',
+        '.cpp': 'cpp',
+        '.html': 'html',
+        '.vue': 'html',
+        '.xml': 'xml',
+        '.yaml': 'yaml',
+        '.css': 'css',
+        '.js': 'javascript',
+        '.sql': 'sql',
+        '.json': 'json',
+        '.md': 'markdown',
+      },
       editor: null,//文本编辑器
       isSave: true,//文件改动状态，是否保存
       oldValue: '',//保存后的文本
@@ -33,23 +49,35 @@ export default {
   created() {
     eventBus.$on("openEditor", data => {
       this.file = data;
-      console.log("this.file", this.file)
       this.editor.setValue(this.file.data);
-      monaco.languages.register('java')
+      this.setLanguage(this.file.name);
     });
   },
   mounted() {
     this.initEditor();
   },
   methods: {
+    setLanguage(fileName) {
+      if (fileName.lastIndexOf(".") !== -1) {
+        //文件没有后缀
+        const suffixName = fileName.substring(fileName.lastIndexOf("."));
+        let language = this.languageMap[suffixName];
+        if (language == null) {
+          language = 'javascript';
+        }
+        monaco.editor.setModelLanguage(this.editor.getModel(), language)
+        return;
+      }
+      monaco.editor.setModelLanguage(this.editor.getModel(), 'javascript')
+    },
     initEditor() {
       // 初始化编辑器，确保dom已经渲染
       this.editor = monaco.editor.create(document.getElementById('container'), {
         value: this.file.data,//编辑器初始显示文字
-        language: '',//语言支持自行查阅demo
+        // language: '',//语言支持自行查阅demo
         automaticLayout: true,//自动布局
         theme: 'vs-dark', //官方自带三种主题vs, hc-black, or vs-dark
-        fontSize: 17,       //字体大小
+        fontSize: 15,       //字体大小
       });
       this.editor.onKeyUp(() => {
         // 当键盘按下，判断当前编辑器文本与已保存的编辑器文本是否一致
@@ -57,10 +85,6 @@ export default {
           this.isSave = false;
         }
       });
-    },
-    //保存编辑器方法
-    saveEditor() {
-      this.oldValue = this.editor.getValue();
     },
     getValue() {
       this.editor.getValue(); //获取编辑器中的文本
@@ -90,4 +114,16 @@ export default {
 }
 
 </script>
+<style scoped="scoped">
+#container {
+  height: 100%;
+  margin-bottom: 1vh;
+}
+
+.icon {
+  width: 2em;
+  height: 2em;
+  vertical-align: -0.5em;
+}
+</style>
 

@@ -34,7 +34,7 @@
 
 <script>
 
-import UploadHead from "../UploadHead";
+import UploadHead from "../nav/UploadHead";
 import eventBus from "../../js/eventBus";
 import Global from "../../js/global";
 

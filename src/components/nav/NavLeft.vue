@@ -1,6 +1,5 @@
 <template>
-  <!-- 修改 -->
-  <div style="height: 100%;">
+  <div>
     <el-menu
       default-active="1"
       class="el-menu-vertical-demo"
@@ -8,7 +7,7 @@
       @close="handleClose"
       background-color="#F9F9F9"
       text-color="#000000"
-      active-text-color="#3C8CFF" style="height: 100%;">
+      active-text-color="#3C8CFF">
       <div>
         <el-image class="pointer" :src="logoSrc" @click="$router.push('/index')"></el-image>
       </div>
@@ -100,37 +99,38 @@
           </router-link>
         </span>
       </el-menu-item>
-<!--      <el-menu-item index="4">
-        <span slot="title">
-          <router-link to="/test"><i class="el-icon-coin"></i>
-            <span class="mobileHide">测试</span>
-          </router-link>
-        </span>
-      </el-menu-item>-->
+      <!--      <el-menu-item index="4">
+              <span slot="title">
+                <router-link to="/test"><i class="el-icon-coin"></i>
+                  <span class="mobileHide">测试</span>
+                </router-link>
+              </span>
+            </el-menu-item>-->
       <div>
         <el-row>
           <el-progress type="circle" :percentage="storePercen"></el-progress>
         </el-row>
-        <p>已使用：{{ (storeMsg.currentSize / 1024 + 0.5).toFixed(0) }} M</p>
-        <p>总容量：{{ storeMsg.maxSize / (1024) }} M</p>
-        <el-row>
+        <el-row type="flex" style="padding-left: 4vh;">
+          已使用：{{ (storeMsg.currentSize / 1024 + 0.5).toFixed(0) }} M
+        </el-row>
+        <el-row type="flex" style="padding-left: 4vh;">总容量：{{ storeMsg.maxSize / (1024) }} M</el-row>
+        <el-row type="flex" style="padding-left: 4vh;">
           <span>我要升级</span>
-          <el-button circle @click="upLevel">
+          <el-button circle @click="upLevel" size="mini" style="margin-left: 1vh;">
             <svg class="icon" aria-hidden="true">
               <use xlink:href="#icon-shengji"></use>
             </svg>
           </el-button>
         </el-row>
       </div>
-
     </el-menu>
 
   </div>
 </template>
 
 <script>
-import logoL from "../img/logo_l.png";
-import Global from "../js/global";
+import logoL from "../../img/logo_l.png";
+import Global from "../../js/global";
 
 export default {
   name: "NavLeft",
@@ -166,22 +166,25 @@ export default {
         params: {},
         method: 'GET',
       }).then(function (rsp) {
-        var data = rsp.data;
+        const data = rsp.data;
         that.storeMsg = data;
-        that.storePercen = Math.ceil(data.currentSize / data.maxSize)
+        that.storePercen = Math.ceil(data.currentSize / data.maxSize) + 1
       })
     },
     handleOpen(key, keyPath) {
-      console.log(key, keyPath);
     },
     handleClose(key, keyPath) {
-      console.log(key, keyPath);
     }
   }
 }
 </script>
 
 <style scoped>
+/deep/ .el-progress-circle {
+  height: 50px;
+  width: 50px;
+}
+
 .router-link-active {
   text-decoration: none;
   color: #3C8CFF;

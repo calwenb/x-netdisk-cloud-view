@@ -20,8 +20,8 @@
 
 
 <script>
-import Global from "../js/global";
-import eventBus from "../js/eventBus";
+import Global from "../../js/global";
+import eventBus from "../../js/eventBus";
 
 export default {
   name: "UploadHead",
@@ -47,15 +47,15 @@ export default {
     },
     beforeAvatarUpload(file) {
       const isJPG = file.type === 'image/jpeg';
-      const isLt2M = file.size / 1024 / 1024 < 2;
+      const isLt10M = file.size / 1024 / 1024 < 10;
 
       if (!isJPG) {
         this.$message.error('上传头像图片只能是 JPG 格式!');
       }
-      if (!isLt2M) {
-        this.$message.error('上传头像图片大小不能超过 2MB!');
+      if (!isLt10M) {
+        this.$message.error('上传头像图片大小不能超过 10MB!');
       }
-      return isJPG && isLt2M;
+      return isJPG && isLt10M;
     },
     progress(event, file, fileList) {
 

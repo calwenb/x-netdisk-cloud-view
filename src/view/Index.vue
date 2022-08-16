@@ -1,37 +1,35 @@
 <template>
-  <!--  修改-->
-  <div>
+  <!-- 整个布局 -->
+  <el-container style="height: 100vh; border: 1px solid #eee">
+    <!--左导航栏-->
+    <el-aside width="200px" style="background-color:  #F9F9F9">
+      <!--管理员页面-->
+      <admin-nav-left :user="user" :token="token" v-if="user.userType=== 0 || user.userType=== 1"/>
+      <navLeft :user="user" :token="token" v-else/>
+    </el-aside>
+
     <el-container>
-      <!--左导航栏-->
-      <el-aside class="leftNav">
-        <!--管理员页面-->
-        <admin-nav-left :user="user" :token="token" v-if="user.userType=== 0 || user.userType=== 1"/>
-        <navLeft :user="user" :token="token" v-else/>
-      </el-aside>
+      <el-header
+        style="z-index: 1; padding-left:1%;padding-bottom: 4%;box-shadow: 0 2px 4px rgba(0, 0, 0, .12), 0 0 6px rgba(0, 0, 0, .04);">
+        <!--头导航栏-->
+        <navHead :user="user" :token="token"/>
+      </el-header>
 
-      <el-container>
-        <el-header
-          style="z-index: 1; padding-left:1%;padding-bottom: 4%;box-shadow: 0 2px 4px rgba(0, 0, 0, .12), 0 0 6px rgba(0, 0, 0, .04);">
-          <!--头导航栏-->
-          <navHead :user="user" :token="token"/>
-        </el-header>
-
-        <el-main style="height: 780px;">
-          <transition name="slide-left" mode="out-in">
-            <router-view />
-          </transition>
-        </el-main>
-      </el-container>
-
+      <el-main>
+        <transition name="slide-left" mode="out-in">
+          <router-view/>
+        </transition>
+      </el-main>
     </el-container>
 
-  </div>
+  </el-container>
+
 </template>
 
 <script>
-import NavHead from "../components/NavHead";
-import AdminNavLeft from "../components/admin/AdminNavLeft";
-import NavLeft from "../components/NavLeft";
+import NavHead from "../components/nav/NavHead";
+import AdminNavLeft from "../components/nav/AdminNavLeft";
+import NavLeft from "../components/nav/NavLeft";
 import Global from "../js/global";
 import eventBus from "../js/eventBus";
 
@@ -99,7 +97,7 @@ export default {
 
   beforeRouteEnter: (to, from, next) => {
     next(vm => {
-      // alert("后端接口已升级为微服务，项目目前处于开发测试阶段，仍会出现许多缺陷，请见谅。")
+      alert("后端接口已升级为微服务，项目目前处于开发测试阶段，仍会出现许多缺陷，请见谅。")
       var token = vm.$cookies.get("TOKEN");
       if (token === null) {
         vm.$router.push({path: '/login'});
@@ -125,13 +123,8 @@ export default {
   }
 }
 
-.el-footer {
-  position: fixed;
-  width: 100%;
-  bottom: 0px;
-}
 
-.el-header, .el-footer {
+.el-header {
   background-color: #ffffff;
   color: #333;
   text-align: center;
@@ -139,7 +132,6 @@ export default {
 }
 
 .el-aside {
-
   background-color: #D3DCE6;
   color: #333;
   text-align: center;
@@ -164,20 +156,24 @@ body > .el-container {
 .el-container:nth-child(7) .el-aside {
   line-height: 320px;
 }
+
 /*过渡动画*/
 .slide-left-enter {
   opacity: 0;
   -webkit-transform: translate(30px, 0);
   transform: translate(30px, 0);
 }
-.slide-left-enter-active{
+
+.slide-left-enter-active {
   transition: all .5s ease;
 }
-.slide-left-leave-to{
+
+.slide-left-leave-to {
   opacity: 0;
   -webkit-transform: translate(-30px, 0);
   transform: translate(-30px, 0);
 }
+
 .slide-left-leave-active {
   transition: all .3s ease;
 }

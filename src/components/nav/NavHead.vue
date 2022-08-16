@@ -97,8 +97,11 @@
     <el-dialog
       title="修改密码"
       :visible.sync="dialogVisible"
-      class="pwdDialog">
-      <span><el-input placeholder="请输入密码" v-model="newPassword" show-password></el-input></span>
+      class="pwdDialog"
+      append-to-body
+    >
+      <el-input placeholder="请输入密码" v-model="password" show-password></el-input>
+      <el-input placeholder="请输入新密码" v-model="newPassword" show-password></el-input>
       <span slot="footer" class="dialog-footer">
               <el-button @click="dialogVisible = false">取 消</el-button>
               <el-button type="primary" @click="updatePassword">确 定</el-button>
@@ -110,13 +113,11 @@
 </template>
 
 <script>
-import UploadFile from "./UploadFile";
-import Global from "../js/global";
-import eventBus from "../js/eventBus";
-import Search from "./Search";
-import UpdateUser from "./UpdateUser";
-import test from "../view/Test";
-import Test from "../view/Test";
+import UploadFile from "../file/UploadFile";
+import Global from "../../js/global";
+import eventBus from "../../js/eventBus";
+import Search from "../file/Search";
+import UpdateUser from "../user/UpdateUser";
 
 export default {
   name: "NavHead",
@@ -132,6 +133,7 @@ export default {
       activeIndex: '0',
       avatarUrl: "https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png",
       dialogVisible: false,
+      password: '',
       newPassword: '',
       parentFolderId: '0',
     };
@@ -149,7 +151,6 @@ export default {
   },
   methods: {
     uploadOpen() {
-      console.log("this.parentFolderId",this.parentFolderId)
       eventBus.$emit("uploadDialog", this.parentFolderId);
     },
     handleCommand(command) {
@@ -233,11 +234,16 @@ export default {
       })
     },
     updatePassword() {
+      if (this.password === '' || this.newPassword === '') {
+        this.errorNotification("不能为空");
+        return;
+      }
       const that = this;
       this.axios({
         url: Global.SERVER_ADDRESS + '/users/password',
-        params: {
-          password: that.newPassword
+        data: {
+          passWord: that.password,
+          newPassWord: that.newPassword
         },
         method: 'PUT',
       }).then(function (rs) {

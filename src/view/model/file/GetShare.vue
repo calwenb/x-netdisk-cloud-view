@@ -57,9 +57,9 @@
 </template>
 
 <script>
-import Global from "../js/global";
+import Global from "../../../js/global";
 import fileDownload from "js-file-download";
-import logoM from "../img/logo_l.png";
+import logoM from "../../../img/logo_l.png";
 
 export default {
   name: "GetShare",
